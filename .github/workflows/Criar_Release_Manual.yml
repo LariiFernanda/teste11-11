@@ -1,0 +1,40 @@
+name: Criar Release Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Número da versão (ex: v1.0.0)'
+        required: true
+        default: ''
+      prerelease:
+        description: 'Marcar como pré-release?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    # 👇 Adiciona permissão para criar releases e tags
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ inputs.version }}
+          release_name: Release ${{ inputs.version }}
+          body: |
+            Alterações nesta release:
+            - Funcionalidade A
+            - Correção de Bug B
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
